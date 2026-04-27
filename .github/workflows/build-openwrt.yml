@@ -171,17 +171,17 @@ jobs:
           ${{ env.FIRMWARE }}/*mt6000*
 
     - name: Delete workflow runs
-      uses: Mattraks/delete-workflow-runs@v3
+      uses: Mattraks/delete-workflow-runs@main
       with:
         retain_days: 0
         keep_minimum_runs: 4
 
     - name: Remove old Releases
-      uses: dev-drprasad/delete-older-releases@v1.2.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      with:
-        keep_latest: 5
-        delete_tags: true
+      run: |
+        for tag in $(gh release list --limit 100 | awk 'NR>5 {print $3}'); do
+          gh release delete "$tag" --yes --cleanup-tag 2>/dev/null || true
+        done
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
 

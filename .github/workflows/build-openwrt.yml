@@ -23,6 +23,7 @@ env:
   UPLOAD_RELEASE: true
   REMOVE_ARTIFACTS: true
   TZ: Asia/Shanghai
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
   DEVICE_NAME:
   FILE_DATE:
   FIRMWARE:
@@ -122,6 +123,10 @@ jobs:
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
+        echo "=== Checking output directory ==="
+        ls -la openwrt/bin/targets/mediatek/filogic/
+        echo "=== Finding all firmware files ==="
+        find openwrt/bin/targets/mediatek/filogic -type f -name "*.bin" -o -name "*.img" -o -name "*.sysupgrade*" | head -20
         cd openwrt/bin/targets/*/*
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
@@ -129,7 +134,7 @@ jobs:
 
     - name: Remove artifacts
       id: removeart
-      uses: c-hive/gha-remove-artifacts@v1.3.0
+      uses: c-hive/gha-remove-artifacts@v2.0.0
       if: env.REMOVE_ARTIFACTS == 'true' && !cancelled()
       with:
         age: '5 day'
@@ -137,12 +142,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload firmware directory
-      uses: actions/upload-artifact@main
+      uses: actions/upload-artifact@v4
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: ${{ env.FIRMWARE }}/*-squashfs-sysupgrade*
-        if-no-files-found: warn 
+        path: |
+          ${{ env.FIRMWARE }}/*glinet*mt6000*
+          ${{ env.FIRMWARE }}/*gl-mt6000*
+          ${{ env.FIRMWARE }}/*mt6000*
+        if-no-files-found: warn
         retention-days: 3
 
     - name: Generate release tag
@@ -155,7 +163,7 @@ jobs:
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
-      uses: softprops/action-gh-release@master
+      uses: softprops/action-gh-release@v2
       if: steps.tag.outputs.status == 'success' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -165,13 +173,13 @@ jobs:
         files: ${{ env.FIRMWARE }}/*
 
     - name: Delete workflow runs
-      uses: Mattraks/delete-workflow-runs@main
+      uses: Mattraks/delete-workflow-runs@v3
       with:
         retain_days: 0
         keep_minimum_runs: 4
 
     - name: Remove old Releases
-      uses: dev-drprasad/delete-older-releases@master
+      uses: dev-drprasad/delete-older-releases@v1.2.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         keep_latest: 5

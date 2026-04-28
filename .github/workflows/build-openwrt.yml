@@ -143,7 +143,7 @@ jobs:
 
     - name: Organize files
       id: organize
-      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true'
       run: |
         echo "=== Checking output directory ==="
         ls -la openwrt/bin/targets/mediatek/filogic/
@@ -168,7 +168,7 @@ jobs:
 
     - name: Generate release tag
       id: tag
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
       run: |
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch release.txt
@@ -177,7 +177,7 @@ jobs:
 
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v2
-      if: steps.tag.outputs.status == 'success' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && steps.tag.outputs.status == 'success'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -189,13 +189,14 @@ jobs:
           ${{ env.FIRMWARE }}/*mt6000*
 
     - name: Delete workflow runs
+      if: steps.compile.outputs.status == 'success'
       uses: Mattraks/delete-workflow-runs@main
       with:
         retain_days: 0
         keep_minimum_runs: 4
 
     - name: Remove old Releases
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
       run: |
         for tag in $(gh release list --limit 100 | awk 'NR>5 {print $3}'); do
           gh release delete "$tag" --yes --cleanup-tag 2>/dev/null || true

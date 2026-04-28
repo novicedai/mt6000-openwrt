@@ -17,7 +17,6 @@ rm -rf feeds/smpackage/{luci-app-fullconenat,luci-app-natter,luci-app-npc,luci-a
 rm -rf feeds/smpackage/{luci-app-torbp,luci-app-easymesh,mentohust}
 
 #delete packages with missing dependencies
-rm -rf feeds/luci/luci-app-mjpg-streamer
 rm -rf feeds/smpackage/{luci-app-mtwifi,luci-app-nginx-pingos,luci-app-nps,luci-app-webd}
 rm -rf feeds/smpackage/{rblibtorrent,trojan,trojan-plus}
 rm -rf feeds/packages/net/onionshare-cli

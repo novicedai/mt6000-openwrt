@@ -16,6 +16,19 @@ rm -rf feeds/smpackage/{luci-app-fullconenat,luci-app-natter,luci-app-npc,luci-a
 #delete recursive dependency
 rm -rf feeds/smpackage/{luci-app-torbp,luci-app-easymesh,mentohust}
 
+#delete packages with missing dependencies
+rm -rf feeds/luci/luci-app-mjpg-streamer
+rm -rf feeds/smpackage/{luci-app-mtwifi,luci-app-nginx-pingos,luci-app-nps,luci-app-webd}
+rm -rf feeds/smpackage/{rblibtorrent,trojan,trojan-plus}
+rm -rf feeds/packages/net/onionshare-cli
+
+#delete packages with recursive dependency
+rm -rf feeds/smpackage/{luci-app-fchomo,luci-app-homeproxy,sing-box-tiny}
+rm -rf feeds/smpackage/{luci-app-kodexplorer,luci-app-nat6-helper}
+rm -rf feeds/smpackage/{luci-app-momo,momo,natmap}
+rm -rf feeds/smpackage/{luci-app-qbittorrent,qbittorrent}
+rm -rf feeds/smpackage/luci-app-alist
+
 #relplace go version 
 #rm -rf feeds/packages/lang/golang
 #git clone https://github.com/kenzok8/golang feeds/packages/lang/golang

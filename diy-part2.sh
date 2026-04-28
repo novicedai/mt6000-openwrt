@@ -17,9 +17,9 @@ rm -rf feeds/smpackage/{luci-app-fullconenat,luci-app-natter,luci-app-npc,luci-a
 rm -rf feeds/smpackage/{luci-app-torbp,luci-app-easymesh,mentohust}
 
 #relplace go version 
-rm -rf feeds/packages/lang/golang
-git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
+#rm -rf feeds/packages/lang/golang
+#git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
 
 # Fix xray-core Go version requirement
-sed -i 's/GOTOOLCHAIN=local/GOTOOLCHAIN=auto/' feeds/packages/net/xray-core/Makefile
+# sed -i 's/GOTOOLCHAIN=local/GOTOOLCHAIN=auto/' feeds/packages/net/xray-core/Makefile
  

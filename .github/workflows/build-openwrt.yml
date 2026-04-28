@@ -43,12 +43,21 @@ jobs:
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
         sudo docker image prune --all --force
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential clang flex g++ gawk gcc-multilib gettext git libncurses5-dev libssl-dev python3 python3-pip zlib1g-dev ccache rsync swig unzip file wget libelf-dev python3-distutils bzip2 cmake cpio curl device-tree-compiler fastjar gperf haveged help2man intltool libc6-dev-i386 libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncursesw5-dev libpython3-dev libreadline-dev libtool lrzsz mkisofs msmtp ninja-build p7zip p7zip-full patch pkgconf python2.7 python3-pyelftools python3-setuptools qemu-utils scons squashfs-tools subversion texinfo uglifyjs upx-ucl vim xmlto xxd
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
+
+    - name: Install Go 1.25
+      run: |
+        wget -q https://go.dev/dl/go1.25.0.linux-amd64.tar.gz -O /tmp/go1.25.0.linux-amd64.tar.gz
+        sudo tar -C /usr/local -xzf /tmp/go1.25.0.linux-amd64.tar.gz
+        rm /tmp/go1.25.0.linux-amd64.tar.gz
+        echo "GOPATH=/usr/local/go/bin" >> $GITHUB_ENV
+        echo "PATH=$PATH:/usr/local/go/bin" >> $GITHUB_ENV
+        /usr/local/go/bin/go version
 
     - name: Clone source code
       working-directory: /workdir
@@ -101,10 +110,18 @@ jobs:
       id: compile
       run: |
         cd openwrt
+        export PATH=$PATH:/usr/local/go/bin
+        export GOTOOLCHAIN=auto
         echo -e "MyMark ... $(nproc) thread compile..."
-        make -j$(nproc) || make -j$(nproc) V=s || { echo "status=failed" >> $GITHUB_OUTPUT; exit 1; }
-        echo "status=success" >> $GITHUB_OUTPUT
+        make -j$(nproc) V=s && echo "status=success" >> $GITHUB_OUTPUT || { echo "status=failed" >> $GITHUB_OUTPUT; exit 1; }
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+
+    - name: Get device name
+      if: steps.compile.outputs.status == 'success'
+      run: |
+        cd openwrt
+        DEVICE=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_([^=]+)=y/\1/')
+        echo "DEVICE_NAME=_${DEVICE}" >> $GITHUB_ENV
 
     - name: Get device name
       if: steps.compile.outputs.status == 'success'

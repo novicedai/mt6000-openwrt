@@ -1,4 +1,4 @@
-# MT6000-compile
+# MT6000-Openwrt-compile-workflow
 
 V0
 Openwrt 24.10 compile action  for MT6000
@@ -11,3 +11,4 @@ Openwrt 24.10 compile action  for MT6000
 V1 
 upgrade to  Openwrt 25.12.2  
 v1.1 edit workflows 
+v1.2 remove docker add luci themes 

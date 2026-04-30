@@ -12,3 +12,4 @@ V1
 upgrade to  Openwrt 25.12.2  
 v1.1 edit workflows 
 v1.2 remove docker add luci themes 
+v1.3 add passwall plugin -- xray\hysteria 

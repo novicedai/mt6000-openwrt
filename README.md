@@ -1,5 +1,7 @@
 # MT6000-Openwrt-compile-workflow
-
+!! important !!
+   增加任何插件后都可能额外增加支持库，当删除插件时，需要检查是否有依赖库，如果有，需要手动删除。
+   
 V0
 Openwrt 24.10 compile action  for MT6000
 

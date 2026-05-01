@@ -160,8 +160,6 @@ jobs:
       with:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: |
-          ${{ env.FIRMWARE }}/*glinet*mt6000*
-          ${{ env.FIRMWARE }}/*gl-mt6000*
           ${{ env.FIRMWARE }}/*mt6000*
         if-no-files-found: warn
         retention-days: 3
@@ -180,7 +178,7 @@ jobs:
       run: |
         gh release create "${{ steps.tag.outputs.release_tag }}" --title "OpenWrt MT6000 - ${{ steps.tag.outputs.release_tag }}" --notes-file release.txt
         for f in "${{ env.FIRMWARE }}"/*glinet*mt6000* "${{ env.FIRMWARE }}"/*gl-mt6000* "${{ env.FIRMWARE }}"/*mt6000*; do
-          [ -f "$f" ] && gh release upload "${{ steps.tag.outputs.release_tag }}" "$f"
+          [ -f "$f" ] && gh release upload "${{ steps.tag.outputs.release_tag }}" "$f" --clobber
         done
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

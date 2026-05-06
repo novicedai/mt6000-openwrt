@@ -16,3 +16,4 @@ v1.1 edit workflows
 v1.2 remove docker add luci themes 
 v1.3 add passwall plugin -- xray\hysteria 
 v1.4 passwall2   + adguardhome 
+v1.5 passwall with xray hysteria / delete passwall2/smartdns 
